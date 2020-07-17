@@ -1,152 +1,93 @@
-const Customer = require("../models/Customers")
-const Collection = require("../models/Collection")
-const Feedback = require('../models/Feedback')
 const jwt = require('jsonwebtoken')
 const config = require('../config/index')
-const generate_token = async (customer) => {
+
+
+const generate_token =  (customer) => {
+    // console.log(customer,123)
+    const token = jwt.sign({customerId : customer.customerId},config.privateKey,{expiresIn:'7 days'})
     
-    const token = jwt.sign({_id : customer._id.toString()},config.privateKey,{expiresIn:'7 days'})
-    
-    console.log(token)
+    console.log(token,123)
 
     const data = jwt.verify(token,'thisismyprivatekey')
     console.log(data)
+
     return token
 
 }
 
-
-
-
-const signUpWithPassword = async (fastify,signUpRequest)=>{
-    console.log(signUpRequest)
-    let customer =  await Customer.findOne({email:signUpRequest.email})
-    let customer1 = await Customer.findOne({mobileNo:signUpRequest.mobileNo})
-    if(customer || customer1){
-        return{
-            error :"Email Id  or Phone Already Used"
-        }
-    }
-    
-    let collection = await Collection.findOne({})
-    if (!collection){
-        collection = await new Collection(collection).save()
-    }
-    collection.noOfCustomers += 1
-    
-
-    customer = {
-        customerId:"Customer_"+collection.noOfCustomers,
-        ...signUpRequest,
-        otpVerified:false,
-    }
-    await new Collection(collection).save()
-    await new Customer(customer).save()
-    return customer
-}
-
-
-
-
-const updateProfile = async (fastify,updateProfileRequest)=>{
-    let customer = await getProfile(fastify,updateProfileRequest.query)
-    // console.log(updateProfileRequest)
-    console.log(customer)
-    if(customer.error){
-        return customer
-    }
-    // console.log(updateProfileRequest.body)
-    let toUpdateProperties = Object.keys(updateProfileRequest.body)
-    // console.log(toUpdateProperties)
+const loginByPassword = async (fastify,loginRequest) => {
+    try{
+    let customer = await fastify.axios.post("http://localhost:3006/checkCredentials",loginRequest)
+    let data = customer.data.data
+    // console.log(data)
     let token;
-    toUpdateProperties.forEach(async (property)=>{
-        // console.log(updateProfileRequest.body[property])
-           
-            customer[property] = updateProfileRequest.body[property]
-    })
-    if (updateProfileRequest.body.otpVerified){
-        console.log(customer.tokens)
-        console.log(updateProfileRequest.body.otpVerified)
-        token = await generate_token(customer)
-        customer.tokens = customer.tokens.concat({token})
-    }
-    console.log(customer)
-    customer = await new Customer(customer).save()
-    customer = customer._doc
-    if(token){
-        delete customer.tokens
-        console.log(customer)
-        customer = {
-            ...customer,
+    if (data.otpVerified){
+        token = fastify.jwt.sign({
+            customerId:data.customerId,
+            email:data.email,
+            mobileNo:data.mobileNo
+        })
+        let tokenUpdateRequest = {
+            customerId:data.customerId,
             token:token
         }
-    }
-
-    return customer
-}
-
-const getProfile = async (fastify,getProfileRequest)=>{
-    const customer = await Customer.findOne(getProfileRequest)
-    if(!customer){
-        return{
-            error : "Customer Not Found Please Check"
-        }
-    }
-
-    return await customer
-}
-
-
-const loginByPassword = async (fastify,loginRequest) => {
-    let customer = await Customer.findOne(loginRequest)
-    if(!customer){
+        console.log(tokenUpdateRequest)
+        let customer = await fastify.axios.post("http://localhost:3006/updateToken",tokenUpdateRequest)
         return {
-            error : "Crendential Wrong"
+            ... data,
+            token:token
+        }
+    }else{
+        return {    
+            error : "Otp Not Verified"
         }
     }
-    let token;
-    if (customer.otpVerified){
-        token = await generate_token(customer)
-        customer.tokens = customer.tokens.concat({token})
-        customer = await new Customer(customer).save()
-        customer = customer._doc
-    }
-    
-    delete customer.password
-    if(token){
-    delete customer.tokens
-    console.log(customer)
-    customer = {
-        ...customer,
-        token:token
+    }catch(e){
+        return{
+            error:e.response.data.errorCause
+        }
     }
 }
-    console.log(customer)
-    return await customer
-}
 
+const verifyOTP = async (fastify,verifyRequest)=> {
+    try {
+    console.log(verifyRequest)
+    let customerId = verifyRequest.customerId
+    let customer = await  fastify.axios.get("http://localhost:3006/getProfile?customerId="+customerId)
+    console.log(customer.data)
+    let data= customer.data.data
 
-
-
-const customerFeedback = async(fastify,feedbackRequest) => {
-
-    const customer = await getProfile(fastify,{customerId:feedbackRequest.customerId})
-    console.log(customer)
-    if(customer.error){
-        return customer
+        if(data.otp !== verifyRequest.otp){
+            return{
+                error:"Incorrect OTP"
+            }  
+        }else{  
+            token = fastify.jwt.sign({
+                customerId:data.customerId,
+                email:data.email,
+                mobileNo:data.mobileNo
+            })
+            let tokenUpdateRequest = {
+                customerId:data.customerId,
+                token:token
+            }
+            console.log(tokenUpdateRequest)
+            let customer = await fastify.axios.post("http://localhost:3006/updateToken",tokenUpdateRequest)
+            return {
+                ... data,
+                token:token
+            }
+        }            
+    }catch(e){
+        return{
+            error:e.response.data.errorCause
+        }  
     }
-
-
-    const feedback = await new Feedback(feedbackRequest).save()
-    return feedback
-
-
 }
+
+
 
 module.exports = {
-    signUpWithPassword,
-    getProfile,
-    updateProfile,
     loginByPassword,
-    customerFeedback
+    verifyOTP
 }

@@ -58,6 +58,19 @@ const swagger = require('./config/swagger')
 // Register Swagger
 fastify.register(require('fastify-swagger'), swagger.options)
 
+fastify.register(require('fastify-jwt'), {
+  secret: "test@&%%PUY", // use .env for this 
+});
+
+// Middleware For authentication
+fastify.register(require('./middleware/auth'))
+
+//cross-origin
+fastify.register(require('fastify-cors'), {
+  origin: '*',
+});
+
+
 // Import Routes
 const routes = require('./routes/routes.js')
 routes.forEach((route, index) => {
