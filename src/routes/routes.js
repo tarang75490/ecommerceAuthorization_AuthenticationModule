@@ -3,7 +3,6 @@ const validators = require('../validators/validators')
 
 // Import Swagger documentation
 const documentation = require('./documentation/documentServicesApis')
-
 const routes = [
     {
         method: "POST",
@@ -19,6 +18,20 @@ const routes = [
         schema: documentation.verifyOTP,
         preValidation: validators.validateVerifyOTP
     },
+    {
+        method:"POST",
+        url:"/updateCustomer",
+        preValidation:validators.validatetoken,
+        handler:controllers.updateCustomer,
+        schema: documentation.updateCustomer,
+    },
+    {
+        method:"POST",
+        url:"/customerFeedback",
+        preValidation:validators.validatetoken,
+        handler:controllers.customerFeedback,
+        schema: documentation.customerFeedback,
+    }
 
 ]
 

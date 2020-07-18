@@ -58,27 +58,50 @@ const swagger = require('./config/swagger')
 // Register Swagger
 fastify.register(require('fastify-swagger'), swagger.options)
 
-fastify.register(require('fastify-jwt'), {
-  secret: "test@&%%PUY", // use .env for this 
-});
-
-// Middleware For authentication
-fastify.register(require('./middleware/auth'))
-
-//cross-origin
+//cross-origin  
 fastify.register(require('fastify-cors'), {
   origin: '*',
 });
 
+fastify.register(require('fastify-jwt'), {
+  secret: config.privateKey, 
+});
 
+// Middleware For authentication
+fastify.register(require('./middleware/auth'))
+// fastify.register(require('./routes/text'))
+
+fastify.addContentTypeParser('application/json', { parseAs: 'string' }, (req, body, done) => {
+  try {
+    const json = JSON.parse(body);
+    console.log(json)
+    done(null, json);
+  } catch (err) {
+    err.statusCode = 400;
+    done(err, undefined);
+  }
+}); 
+
+// fastify.get('/routerDemo',{
+//   preValidation:[fastify.jwtauthentication]
+// }, (req,res) =>{
+//   res.status(200).send({
+//     message:"sucess",
+//     header:req.headers,
+
+//   })
+// }
+// )
+
+// Import and Register Routes
+fastify.decorateRequest('fastify', fastify);   
 // Import Routes
 const routes = require('./routes/routes.js')
 routes.forEach((route, index) => {
   fastify.route(route)
 })
 
-// Import and Register Routes
-fastify.decorateRequest('fastify', fastify);
+
 
 const HttpError = require("./models/errors/httpError")
 fastify.setErrorHandler(function (error, request, reply) {
@@ -116,3 +139,6 @@ fastify.listen(appconfig.port, function (err, address) {
     fastify.log.info(`server listening on ${fastify.server.address().port}`)
   }
 });
+
+
+module.exports = fastify;

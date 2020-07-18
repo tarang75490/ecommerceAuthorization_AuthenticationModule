@@ -5,7 +5,7 @@
 // const auth = async (req,res,next) =>{
 //     try{
 //     const token = req.header('Authorization').replace('Bearer ','')
-//     const decode =  jwt.verify(token,process.env.JWT_SECRET)
+//      
 //     const user = await User.findOne({_id : decode._id ,'tokens.token':token})
 
 //     if(!user){
@@ -27,13 +27,21 @@
 
 
 
-const fp = require('fastify-plugin');
+const fastifyPlugins = require('fastify-plugin');
 
-module.exports = fp(async (fastify) => {
-  fastify.decorate('authenticate', async (req, res) => {
+module.exports = fastifyPlugins(async (fastify) => {
+  fastify.decorate('jwtauthentication', async (req, res) => {
     try {
+      console.log("1212")
+      console.log("verification")
       await req.jwtVerify();
+      const token = req.headers.authorization.replace('Bearer ','')
+      const decodedToken = fastify.jwt.decode(token)
+      res.status(200).send({msg:"Successfully authenticated !!",
+                        body:req.body,
+                      encypt:decodedToken})
     } catch (err) {
+      console.log(err)
       res.send(err);
     }
   });

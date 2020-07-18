@@ -85,9 +85,39 @@ const verifyOTP = async (fastify,verifyRequest)=> {
     }
 }
 
+const updateCustomer = async (fastify,updateCustomer) => {
+    try{
+        let customer = await  fastify.axios.post("http://localhost:3006/updateProfile?customerId="+updateCustomer.query.customerId,updateCustomer.body)
+
+        return customer.data.data
+    }catch(e){
+        console.log(e.response.data.errorCause)
+        return{
+            error:e.response.data.errorCause
+        }
+    }
+}
+
+const customerFeedback = async (fastify,customerFeedbackRequest) => {
+    try{
+        console.log(customerFeedbackRequest)
+        let customer = await  fastify.axios.post("http://localhost:3006/customerFeedback",customerFeedbackRequest)
+
+        return customer.data.data
+    }catch(e){
+        console.log(e.response.data.errorCause)
+        return{
+            error:e.response.data.errorCause
+        }
+    }
+}
+
+
 
 
 module.exports = {
     loginByPassword,
-    verifyOTP
+    verifyOTP,
+    updateCustomer,
+    customerFeedback
 }
