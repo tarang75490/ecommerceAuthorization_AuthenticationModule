@@ -19,7 +19,7 @@ const loginByPassword = async (fastify,loginRequest) => {
     try{
     let customer = await fastify.axios.post("http://localhost:3006/checkCredentials",loginRequest)
     let data = customer.data.data
-    // console.log(data)
+    console.log(data)
     let token;
     if (data.otpVerified){
         token = fastify.jwt.sign({
@@ -88,13 +88,11 @@ const verifyOTP = async (fastify,verifyRequest)=> {
 const updateCustomer = async (fastify,updateCustomer) => {
     try{
         let customer = await  fastify.axios.post("http://localhost:3006/updateProfile?customerId="+updateCustomer.query.customerId,updateCustomer.body)
-
+        console.log(customer.data.data,"update")
         return customer.data.data
     }catch(e){
         console.log(e.response.data.errorCause)
-        return{
-            error:e.response.data.errorCause
-        }
+        return "Not found"
     }
 }
 
@@ -102,7 +100,7 @@ const customerFeedback = async (fastify,customerFeedbackRequest) => {
     try{
         console.log(customerFeedbackRequest)
         let customer = await  fastify.axios.post("http://localhost:3006/customerFeedback",customerFeedbackRequest)
-
+        console.log(customer.data.data)
         return customer.data.data
     }catch(e){
         console.log(e.response.data.errorCause)

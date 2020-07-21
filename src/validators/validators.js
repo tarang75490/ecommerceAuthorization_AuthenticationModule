@@ -32,19 +32,26 @@ const jwt = require('jsonwebtoken')
 
 exports.validatetoken = async function(req,res,done) {
     try {
-      await req.jwtVerify();
-      const token = req.headers.authorization.replace('Bearer ','')
-      const decodedToken =jwt.verify(token,process.env.PRIVATE_KEY)
+      const decodedToken = await req.jwtVerify();
+      console.log(decodedToken)
       let customer = await  axios.get("http://localhost:3006/getProfile?customerId="+decodedToken.customerId)
         console.log(!customer)
-        if (!customer) {
+        console.log(customer.data.data.customerId !== req.query.customerId)
+        if(!customer){
             res.code(400)
             done(new HttpError('faliure', 20001, 'Not Authorized'))
-        }else{
+        }
+        // else if (customer.data.data.customerId != req.query.customerId) {
+        //     res.code(400)
+        //     done(new HttpError('faliure', 20001, 'Not Authorized'))
+        // }
+        else{
             done()
         }
+        
     }catch (err) {
         res.code(401)
         done(new HttpError('faliure', 20001, 'Not Authorized'))
   }
+  done()    
 }
