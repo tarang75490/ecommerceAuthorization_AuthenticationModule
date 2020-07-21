@@ -138,7 +138,7 @@ fastify.listen(PORT,host, function (err, address) {
     process.exit(1)
   } else {
     // fastify.swagger()
-    fastify.log.info(`server listening on ${fPORT}`)
+    fastify.log.info(`server listening on ${PORT}`)
   }
 });
 
