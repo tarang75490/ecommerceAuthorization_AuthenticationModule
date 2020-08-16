@@ -63,24 +63,13 @@ fastify.register(require('fastify-cors'), {
   origin: '*',
 });
 
-fastify.register(require('fastify-jwt'), {
-  secret: config.privateKey, 
-});
+  fastify.register(require('fastify-jwt'), {
+    secret: config.privateKey, 
+  });
 
 // Middleware For authentication
 // fastify.register(require('./middleware/auth'))
 // fastify.register(require('./routes/text'))
-
-fastify.addContentTypeParser('application/json', { parseAs: 'string' }, (req, body, done) => {
-  try {
-    const json = JSON.parse(body);
-    console.log(json)
-    done(null, json);
-  } catch (err) {
-    err.statusCode = 400;
-    done(err, undefined);
-  }
-}); 
 
 // fastify.get('/routerDemo',{
 //   preValidation:[fastify.jwtauthentication]

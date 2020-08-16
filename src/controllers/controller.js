@@ -6,9 +6,13 @@ const HttpError = require('../models/errors/httpError')
 exports.loginByPassword= async (req, res) => {
     try {
         let response = await service.loginByPassword(req.fastify, req.body)
+        console.log(response.cu)
         if(response.error){
-            res.code(400)
-                throw new HttpError('faliure', 22005,response.error)
+            res.status(200).send({
+                status: 'failure',
+                data:{customerId:response.customerId},
+                message:response.error
+            })
         }
         return res.status(200).send({
             status: 'success',
@@ -16,7 +20,7 @@ exports.loginByPassword= async (req, res) => {
         })
     } catch (e) {
         res.code(500)
-        throw new HttpError('faliure', 2001, "Login Failed", e.message)
+        throw new HttpError('failure', 2001, "Login Failed", e.message)
     }
 }
 
@@ -24,8 +28,11 @@ exports.verifyOTP= async (req, res) => {
     try {
         let response = await service.verifyOTP(req.fastify, req.body)
         if(response.error){
-            res.code(400)
-                throw new HttpError('faliure', 22005,response.error)
+            res.status(200).send({
+                status: 'failure',
+                data:{},
+                message:response.error
+            })
         }
         return res.status(200).send({
             status: 'success',

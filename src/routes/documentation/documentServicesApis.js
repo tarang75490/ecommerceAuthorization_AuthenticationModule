@@ -164,7 +164,7 @@ exports.loginByPassword = {
                 "type": "string"
             },
             "mobileNo": {
-                "type": "string"
+                "type": "number"
             },
         },
         "required": [
@@ -178,7 +178,7 @@ exports.loginByPassword = {
             "properties": {
                 "status": {
                     "type": "string",
-                    "enum": ['failiure', 'success'],
+                    "enum": ['failure', 'success'],
                 },
                 "message": {
                     "type": "string"
@@ -193,22 +193,22 @@ exports.loginByPassword = {
                             "type": "string"
                         },
                         "mobileNo": {
-                            "type": "string"
+                            "type": "number"
                         },
                         "email": {
                             "type": "string"
                         },
                         "otpVerified": {
                             "type": "boolean",
-                            "default":false
+                            // "default":false
                         },
                         "markForDelete":{   
                             "type":"boolean",
-                            "default":false
+                            // "default":false
                         },
                         "otp":{
                             "type":"string",
-                            "default":""
+                            // "default":""
                         
                         },
                         "googleId":{
@@ -222,11 +222,7 @@ exports.loginByPassword = {
                         }
                     },
                     "required": [
-                        "email",
-                        "mobileNo",
-                        "customerId",
-                        "userName",
-                        "otpVerified",
+                      
                     ]
             }
             },
@@ -356,11 +352,11 @@ exports.verifyOTP = {
                         }
                     },
                     "required": [
-                        "email",
-                        "mobileNo",
-                        "customerId",
-                        "userName",
-                        "otpVerified",
+                        // "email",
+                        // "mobileNo",
+                        // "customerId",
+                        // "userName",
+                        // "otpVerified",
                     ]
             }
             },
