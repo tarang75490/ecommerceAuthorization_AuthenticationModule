@@ -18,7 +18,9 @@ const generate_token =  (customer) => {
 const loginByPassword = async (fastify,loginRequest) => {
     try{
         console.log(loginRequest)
-    let customer = await fastify.axios.post("http://localhost:3006/checkCredentials",loginRequest)
+    // let customer = await fastify.axios.post("http://localhost:3011/checkCredentials",loginRequest)
+    let customer = await fastify.axios.post("https://colossalcustomer.herokuapp.com/checkCredentials",loginRequest)
+
     let data = customer.data.data
     console.log(data)
     let token;
@@ -33,7 +35,7 @@ const loginByPassword = async (fastify,loginRequest) => {
             token:token
         }
         console.log(tokenUpdateRequest)
-        let customer = await fastify.axios.post("http://localhost:3006/updateToken",tokenUpdateRequest)
+        let customer = await fastify.axios.post("https://colossalcustomer.herokuapp.com/updateToken",tokenUpdateRequest)
         return {
             ... data,
             token:token
@@ -55,7 +57,7 @@ const verifyOTP = async (fastify,verifyRequest)=> {
     try {
     console.log(verifyRequest)
     let customerId = verifyRequest.customerId
-    let customer = await  fastify.axios.get("http://localhost:3006/getProfile?customerId="+customerId)
+    let customer = await  fastify.axios.get("https://colossalcustomer.herokuapp.com/getProfile?customerId="+customerId)
     console.log(customer.data)
     let data= customer.data.data
 
@@ -74,7 +76,7 @@ const verifyOTP = async (fastify,verifyRequest)=> {
                 token:token
             }
             console.log(tokenUpdateRequest)
-            let customer = await fastify.axios.post("http://localhost:3006/updateToken",tokenUpdateRequest)
+            let customer = await fastify.axios.post("https://colossalcustomer.herokuapp.com/updateToken",tokenUpdateRequest)
             return {
                 ... data,
                 token:token
@@ -89,7 +91,7 @@ const verifyOTP = async (fastify,verifyRequest)=> {
 
 const updateCustomer = async (fastify,updateCustomer) => {
     try{
-        let customer = await  fastify.axios.post("http://localhost:3006/updateProfile?customerId="+updateCustomer.query.customerId,updateCustomer.body)
+        let customer = await  fastify.axios.post("https://colossalcustomer.herokuapp.com/updateProfile?customerId="+updateCustomer.query.customerId,updateCustomer.body)
         console.log(customer.data.data,"update")
         return customer.data.data
     }catch(e){
@@ -101,7 +103,7 @@ const updateCustomer = async (fastify,updateCustomer) => {
 const customerFeedback = async (fastify,customerFeedbackRequest) => {
     try{
         console.log(customerFeedbackRequest)
-        let customer = await  fastify.axios.post("http://localhost:3006/customerFeedback",customerFeedbackRequest)
+        let customer = await  fastify.axios.post("https://colossalcustomer.herokuapp.com/customerFeedback",customerFeedbackRequest)
         console.log(customer.data.data)
         return customer.data.data
     }catch(e){
