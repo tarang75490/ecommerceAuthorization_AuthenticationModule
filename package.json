@@ -12,7 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "config": "^3.3.1",
     "dotenv": "^8.2.0",
     "expandenv": "^1.0.0",
